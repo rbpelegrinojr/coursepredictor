@@ -217,9 +217,8 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user, remember=remember)
-            next_page = request.args.get('next')
             flash(f'Welcome back, {user.username}!', 'success')
-            return redirect(next_page or url_for('home'))
+            return redirect(url_for('home'))
         else:
             flash('Invalid username or password.', 'danger')
 
@@ -353,4 +352,4 @@ with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

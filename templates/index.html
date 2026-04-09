@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Course Outcome Prediction{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Course Outcome Prediction</h1>
+    <p class="subtitle">Fill in your academic information to discover your best-fit courses.</p>
+
+    <form method="POST" class="prediction-form">
+        <div class="form-grid">
+            <!-- Strand -->
+            <div class="form-group">
+                <label for="STRAND">SHS Strand</label>
+                <select name="STRAND" id="STRAND" required>
+                    <option value="" disabled selected>Select your strand</option>
+                    {% for key, value in strand_mapping.items() %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Tier -->
+            <div class="form-group">
+                <label for="TIER">School Tier</label>
+                <select name="TIER" id="TIER" required>
+                    <option value="" disabled selected>Select your tier</option>
+                    {% for key, value in tier_mapping.items() %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- SHS General Average -->
+            <div class="form-group">
+                <label for="SHS_GENERAL_AVERAGE">SHS General Average</label>
+                <input type="text" id="SHS_GENERAL_AVERAGE" name="SHS_GENERAL_AVERAGE"
+                       placeholder="e.g. 88.5" required oninput="filterInput(this)">
+            </div>
+
+            <!-- Language -->
+            <div class="form-group">
+                <label for="LANGUAGE">Language Score</label>
+                <input type="text" id="LANGUAGE" name="LANGUAGE"
+                       placeholder="e.g. 32.0" required
+                       oninput="filterInput(this); updateTotal()">
+            </div>
+
+            <!-- Science -->
+            <div class="form-group">
+                <label for="SCIENCE">Science Score</label>
+                <input type="text" id="SCIENCE" name="SCIENCE"
+                       placeholder="e.g. 28.5" required
+                       oninput="filterInput(this); updateTotal()">
+            </div>
+
+            <!-- General Knowledge -->
+            <div class="form-group">
+                <label for="GENERAL_KNOWLEDGE">General Knowledge Score</label>
+                <input type="text" id="GENERAL_KNOWLEDGE" name="GENERAL_KNOWLEDGE"
+                       placeholder="e.g. 25.0" required
+                       oninput="filterInput(this); updateTotal()">
+            </div>
+
+            <!-- Math -->
+            <div class="form-group">
+                <label for="MATH">Math Score</label>
+                <input type="text" id="MATH" name="MATH"
+                       placeholder="e.g. 30.0" required
+                       oninput="filterInput(this); updateTotal()">
+            </div>
+
+            <!-- Total (auto-computed) -->
+            <div class="form-group">
+                <label for="TOTAL">Total Score <span class="badge">Auto-calculated</span></label>
+                <input type="text" id="TOTAL" name="TOTAL" readonly>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-predict">🎓 Predict My Course</button>
+    </form>
+
+    <!-- Results -->
+    {% if predictions %}
+    <div class="predictions-card">
+        <h2>🏆 Top Predicted Courses</h2>
+        <div class="prediction-list">
+            {% for prediction in predictions %}
+            <div class="prediction-item rank-{{ loop.index }}">
+                <div class="rank-badge">#{{ loop.index }}</div>
+                <div class="prediction-details">
+                    <span class="course-name">{{ prediction.course }}</span>
+                    <div class="confidence-bar-container">
+                        <div class="confidence-bar"
+                             style="width: {{ prediction.confidence }}">
+                        </div>
+                        <span class="confidence-label">{{ prediction.confidence }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <p class="prediction-note">
+            💡 This prediction is based on your academic profile using a data mining model.
+            Consider this as a guide alongside your personal interests.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function filterInput(input) {
+        const value = input.value;
+        if (!/^\d*\.?\d*$/.test(value)) {
+            input.value = value.slice(0, -1);
+        }
+    }
+
+    function updateTotal() {
+        const gk = parseFloat(document.querySelector('input[name="GENERAL_KNOWLEDGE"]').value) || 0;
+        const sc = parseFloat(document.querySelector('input[name="SCIENCE"]').value) || 0;
+        const mt = parseFloat(document.querySelector('input[name="MATH"]').value) || 0;
+        const ln = parseFloat(document.querySelector('input[name="LANGUAGE"]').value) || 0;
+        document.querySelector('input[name="TOTAL"]').value = Math.round(gk + sc + mt + ln);
+    }
+</script>
+{% endblock %}

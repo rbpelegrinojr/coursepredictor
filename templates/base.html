@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Course Outcome Prediction{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Background -->
+    <div class="bg-overlay"></div>
+
+    <!-- Navigation -->
+    {% if current_user.is_authenticated %}
+    <nav class="navbar">
+        <div class="navbar-brand">📚 Course Predictor</div>
+        <div class="navbar-links">
+            <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
+                🏠 Predict
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                📊 Dashboard
+            </a>
+            <span class="nav-user">👤 {{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}" class="nav-link logout">🚪 Logout</a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Flash messages -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
